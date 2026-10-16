@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="el" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Μαρία & Νίκος | PM Cinematography Client Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #f5f5f4; }
+    .font-serif-cinema { font-family: 'Cormorant Garamond', serif; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
+
+  <!-- DEV BAR: Μόνο για εσένα για να τεστάρεις τα UX states (Mobile vs Desktop & Couple vs Guest) -->
+  <div class="bg-zinc-900 border-b border-zinc-800 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 text-zinc-400">
+    <div class="flex items-center gap-2">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="font-medium text-zinc-200">DEV PREVIEW MODE:</span>
+      <span>Δοκίμασε πώς αλλάζει το UX ανά συσκευή και ρόλο (Demo PIN: <strong class="text-amber-400">2408</strong>)</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="setDeviceMode('desktop')" id="btn-desktop" class="px-2.5 py-1 rounded bg-zinc-800 text-white font-medium border border-zinc-700">
+        💻 Προσομοίωση Desktop
+      </button>
+      <button onclick="setDeviceMode('mobile')" id="btn-mobile" class="px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white">
+        📱 Προσομοίωση Κινητού
+      </button>
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION -->
+  <header class="max-w-6xl w-full mx-auto px-6 py-6 flex items-center justify-between border-b border-zinc-900">
+    <div class="tracking-[0.25em] text-xs uppercase font-semibold text-zinc-300">
+      PM CINEMATOGRAPHY <span class="text-zinc-600 mx-2">|</span> <span class="text-zinc-500 font-normal">PRIVATE SCREENING ROOM</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="role-badge" class="text-xs px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">
+        👁️ Προβολή Επισκέπτη
+      </span>
+      <button id="unlock-top-btn" onclick="scrollToVault()" class="text-xs px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition">
+        🔑 Ξεκλείδωμα Αρχείων (PIN)
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO / TITLE SECTION -->
+  <main class="max-w-5xl w-full mx-auto px-6 py-10 flex-1">
+    <div class="text-center mb-8">
+      <p class="text-xs uppercase tracking-[0.3em] text-amber-400/80 mb-2">Unobtrusive Documentary Film</p>
+      <h1 class="font-serif-cinema text-5xl md:text-6xl font-normal tracking-wide text-white mb-2">Μαρία & Νίκος</h1>
+      <p class="text-sm text-zinc-400 font-light">24 Αυγούστου 2026 • Μυτιλήνη, Λέσβος</p>
+    </div>
+
+    <!-- THE SCREENING ROOM (STREAMING PLAYER) -->
+    <section class="mb-12">
+      <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-2xl group">
+        <!-- Mock Video Poster / Frame -->
+        <img id="video-poster" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80" alt="Wedding Still" class="w-full h-full object-cover opacity-65 group-hover:scale-[1.01] transition duration-700" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+
+        <!-- Center Play Button -->
+        <button onclick="alert('Εδώ ξεκινάει ο clean player (π.χ. Vidstack / Bunny Stream / Vimeo Unlisted) σε 4K χωρίς διαφημίσεις.')" class="absolute inset-0 m-auto w-20 h-20 rounded-full bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center hover:scale-110 hover:bg-white/25 transition duration-300">
+          <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+
+        <!-- Bottom Film Metadata inside Player -->
+        <div class="absolute bottom-5 left-6 right-6 flex items-end justify-between">
+          <div>
+            <span id="active-chapter-tag" class="text-[11px] uppercase tracking-widest text-amber-300 bg-black/60 backdrop-blur px-2.5 py-1 rounded">01. Highlight Teaser</span>
+            <h2 id="active-chapter-title" class="text-xl font-medium text-white mt-1.5">The Teaser Film</h2>
+          </div>
+          <span id="active-chapter-duration" class="text-xs text-zinc-300 bg-black/60 px-2.5 py-1 rounded">02:15 • 4K UHD</span>
+        </div>
+      </div>
+
+      <!-- Chapter / Film Selector -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+        <button onclick="selectFilm(1)" id="film-btn-1" class="text-left p-4 rounded-xl bg-zinc-900/90 border border-amber-500/40 transition">
+          <div class="flex justify-between items-center text-xs text-amber-400 mb-1">
+            <span>ΜΕΡΟΣ 01</span>
+            <span>02:15</span>
+          </div>
+          <div class="font-medium text-sm text-white">The Teaser Film</div>
+          <div class="text-xs text-zinc-400 mt-0.5">Σύντομη κινηματογραφική περίληψη</div>
+        </button>
+
+        <button onclick="selectFilm(2)" id="film-btn-2" class="text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition">
+          <div class="flex justify-between items-center text-xs text-zinc-400 mb-1">
+            <span>ΜΕΡΟΣ 02</span>
+            <span>42:10</span>
+          </div>
+          <div class="font-medium text-sm text-white">Main Documentary Film</div>
+          <div class="text-xs text-zinc-500 mt-0.5">Η κύρια ταινία του γάμου σας</div>
+        </button>
+
+        <button onclick="selectFilm(3)" id="film-btn-3" class="text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition">
+          <div class="flex justify-between items-center text-xs text-zinc-400 mb-1">
+            <span>ΜΕΡΟΣ 03</span>
+            <span>1:18:00</span>
+          </div>
+          <div class="font-medium text-sm text-white">Ceremony & Speeches</div>
+          <div class="text-xs text-zinc-500 mt-0.5">Ολόκληρο το μυστήριο & οι ευχές</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- THE VAULT (DOWNLOADS & ARCHIVE - 30GB) -->
+    <section id="vault-section" class="rounded-2xl bg-zinc-900/50 border border-zinc-800/90 p-6 md:p-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-xl font-medium text-white">Ψηφιακό Αρχείο & Λήψεις (The Vault)</h3>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              Cloud Backup Ενεργό (165 ημέρες ακόμα)
+            </span>
+          </div>
+          <p class="text-sm text-zinc-400 mt-1">
+            Εδώ βρίσκονται τα ασυμπίεστα Master αρχεία σας για αποθήκευση σε υπολογιστή/USB και οι εκδόσεις για Social Media.
+          </p>
+        </div>
+      </div>
+
+      <!-- LOCKED STATE (Visible to Guests until PIN is entered) -->
+      <div id="vault-locked" class="py-8 text-center max-w-md mx-auto">
+        <div class="w-12 h-12 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center mx-auto mb-3 text-amber-400">
+          🔒
+        </div>
+        <h4 class="text-base font-medium text-white">Περιοχή μόνο για το Ζευγάρι</h4>
+        <p class="text-xs text-zinc-400 mt-1 mb-5">
+          Οι επισκέπτες μπορούν να παρακολουθήσουν τις ταινίες παραπάνω. Για τη λήψη των Master αρχείων (30 GB), εισάγετε το 4-ψήφιο PIN σας (δοκίμασε <strong class="text-zinc-200">2408</strong>).
+        </p>
+        <div class="flex items-center justify-center gap-2">
+          <input id="pin-input" type="password" maxlength="4" placeholder="PIN (2408)" class="w-36 text-center tracking-[0.3em] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400" />
+          <button onclick="unlockVault()" class="bg-amber-500 hover:bg-amber-400 text-black font-medium text-sm px-4 py-2 rounded-lg transition">
+            Ξεκλείδωμα
+          </button>
+        </div>
+        <p id="pin-error" class="text-xs text-rose-400 mt-2 hidden">Λάθος PIN. Δοκιμάστε το 2408.</p>
+      </div>
+
+      <!-- UNLOCKED STATE (Visible after PIN) -->
+      <div id="vault-unlocked" class="hidden pt-6 space-y-4">
+        
+        <!-- Mobile Warning Banner (Only visible when Mobile Mode is simulated or on small screen) -->
+        <div id="mobile-warning" class="hidden rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 text-xs text-amber-200 flex items-start gap-3">
+          <span class="text-lg">📱</span>
+          <div>
+            <strong class="block text-amber-300 mb-0.5">Βρίσκεστε σε Κινητή Συσκευή</strong>
+            Μπορείτε να κατεβάσετε άμεσα το Teaser για τα Social Media (180 MB). Τα μεγάλα Master αρχεία (28.4 GB) έχουν κλειδώσει αυτόματα για να μην γεμίσει η μνήμη του κινητού σας. Ανοίξτε τη σελίδα από υπολογιστή.
+          </div>
+        </div>
+
+        <!-- Download Card 1: Social Media Ready (Always active on Mobile & Desktop) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-white">1. Έκδοση για Κινητό & Social Media (Instagram / TikTok)</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">1080p MP4 • 180 MB</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1">Κατεβαίνει σε λιγότερο από 1 λεπτό. Έτοιμο για αποθήκευση στο κινητό και κοινοποίηση.</p>
+          </div>
+          <a href="#direct-cloud-link-social" onclick="alert('Direct Download Link (π.χ. Cloudflare R2 / Google Drive Direct) - Μηδενικό traffic στον server σου!')" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium transition">
+            ⬇️ Λήψη στο Κινητό / PC (180 MB)
+          </a>
+        </div>
+
+        <!-- Download Card 2: Heavy Master 4K Archive (30GB - Disabled on Mobile, Active on Desktop) -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium text-white">2. Master 4K Cinema Pack (Όλες οι ταινίες σε πλήρη ποιότητα)</span>
+              <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">4K UHD • 28.4 GB</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1">Αρχεία υψηλού bitrate για προβολή σε μεγάλη Smart TV και μόνιμη αρχειοθέτηση σε σκληρό δίσκο.</p>
+          </div>
+
+          <!-- Desktop Button -->
+          <a id="master-download-desktop" href="#direct-cloud-link-master" onclick="alert('Direct Download 28.4 GB απευθείας από Google Drive / R2!')" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold transition">
+            ⬇️ Λήψη Master 4K (28.4 GB)
+          </a>
+
+          <!-- Mobile Fallback Button -->
+          <button id="master-download-mobile" onclick="alert('Θα σταλεί email υπενθύμισης με το link στο ζευγάρι για να το ανοίξουν από το laptop τους!')" class="hidden shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-medium">
+            ✉️ Στείλε μου υπενθύμιση για PC
+          </button>
+        </div>
+
+        <!-- Smart TV / USB exFAT Micro-Guide -->
+        <details class="group rounded-xl bg-zinc-950/40 border border-zinc-800/80 px-4 py-3 text-xs text-zinc-400">
+          <summary class="cursor-pointer font-medium text-zinc-300 flex items-center justify-between">
+            <span>📺 Πώς να δείτε το Master 4K αρχείο στην Τηλεόρασή σας (Οδηγός USB)</span>
+            <span class="group-open:rotate-180 transition">▼</span>
+          </summary>
+          <div class="mt-2 pt-2 border-t border-zinc-800/80 space-y-1 leading-relaxed">
+            <p>• Επειδή τα Master αρχεία ξεπερνούν τα 4 GB, το USB φλασάκι σας πρέπει να είναι μορφοποιημένο σε <strong>exFAT</strong> (και όχι FAT32).</p>
+            <p>• Κάντε αντιγραφή των αρχείων `.mp4` στο USB και συνδέστε το απευθείας στη θύρα USB της Smart TV σας.</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl w-full mx-auto px-6 py-8 border-t border-zinc-900 text-center text-xs text-zinc-600">
+    Crafted by PM Cinematography • Zero-Storage Client Portal Architecture
+  </footer>
+
+  <script>
+    const films = {
+      1: { tag: '01. Highlight Teaser', title: 'The Teaser Film', duration: '02:15 • 4K UHD', poster: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80' },
+      2: { tag: '02. Main Feature', title: 'Main Documentary Film', duration: '42:10 • 4K UHD', poster: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1600&q=80' },
+      3: { tag: '03. Full Archive', title: 'Ceremony & Speeches', duration: '1:18:00 • 4K UHD', poster: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1600&q=80' }
+    };
+
+    function selectFilm(id) {
+      document.getElementById('active-chapter-tag').textContent = films[id].tag;
+      document.getElementById('active-chapter-title').textContent = films[id].title;
+      document.getElementById('active-chapter-duration').textContent = films[id].duration;
+      document.getElementById('video-poster').src = films[id].poster;
+
+      [1, 2, 3].forEach(num => {
+        const btn = document.getElementById('film-btn-' + num);
+        if (num === id) {
+          btn.className = 'text-left p-4 rounded-xl bg-zinc-900/90 border border-amber-500/40 transition';
+        } else {
+          btn.className = 'text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition';
+        }
+      });
+    }
+
+    function scrollToVault() {
+      document.getElementById('vault-section').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('pin-input').focus();
+    }
+
+    function unlockVault() {
+      const pin = document.getElementById('pin-input').value.trim();
+      if (pin === '2408') {
+        document.getElementById('vault-locked').classList.add('hidden');
+        document.getElementById('vault-unlocked').classList.remove('hidden');
+        document.getElementById('role-badge').innerHTML = '🔓 Πρόσβαση Ζευγαριού';
+        document.getElementById('role-badge').className = 'text-xs px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
+        document.getElementById('unlock-top-btn').classList.add('hidden');
+      } else {
+        document.getElementById('pin-error').classList.remove('hidden');
+      }
+    }
+
+    function setDeviceMode(mode) {
+      const isMobile = mode === 'mobile';
+      document.getElementById('mobile-warning').classList.toggle('hidden', !isMobile);
+      document.getElementById('master-download-desktop').classList.toggle('hidden', isMobile);
+      document.getElementById('master-download-mobile').classList.toggle('hidden', !isMobile);
+
+      document.getElementById('btn-desktop').className = !isMobile
+        ? 'px-2.5 py-1 rounded bg-zinc-800 text-white font-medium border border-zinc-700'
+        : 'px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white';
+      document.getElementById('btn-mobile').className = isMobile
+        ? 'px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-medium border border-amber-500/40'
+        : 'px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white';
+    }
+  </script>
+</body>
+</html>

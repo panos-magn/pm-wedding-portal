@@ -1,265 +1,833 @@
 <!DOCTYPE html>
-<html lang="el" class="dark">
+<html lang="el">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Μαρία & Νίκος | PM Cinematography Client Portal</title>
+  <title>Μαρία & Νίκος — Exhibition No. 042 | PM Cinematography</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #f5f5f4; }
-    .font-serif-cinema { font-family: 'Cormorant Garamond', serif; }
+    :root {
+      --bg-obsidian: #080807;
+      --bg-elevated: #0f0e0c;
+      --ink-bone: #f2efe9;
+      --ink-muted: #8a8479;
+      --ink-dim: #4a463f;
+      --accent-gold: #c8a97e;
+      --hairline: rgba(242, 239, 233, 0.11);
+      --hairline-strong: rgba(242, 239, 233, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background-color: var(--bg-obsidian); color: var(--ink-bone); }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: var(--bg-obsidian);
+      color: var(--ink-bone);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-editorial { font-family: 'Cormorant Garamond', Georgia, serif; }
+    .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+
+    /* Subtle Analog 35mm Film Grain Overlay */
+    .film-grain {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.038;
+    }
+
+    /* Architectural Hairline Grid */
+    .hairline-t { border-top: 1px solid var(--hairline); }
+    .hairline-b { border-bottom: 1px solid var(--hairline); }
+    .hairline-l { border-left: 1px solid var(--hairline); }
+    .hairline-r { border-right: 1px solid var(--hairline); }
+    .hairline-box { border: 1px solid var(--hairline); }
+
+    /* Rotating SVG Text Ring on Play Button */
+    @keyframes slowSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spin-slow { animation: slowSpin 22s linear infinite; }
+
+    /* Ambient Cinema Glow behind Player */
+    .ambient-glow {
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(circle at 50% 50%, rgba(200, 169, 126, 0.16), rgba(140, 95, 60, 0.05) 55%, transparent 75%);
+      filter: blur(50px);
+      opacity: 0.85;
+      transition: opacity 0.8s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* CinemaScope 2.39:1 Letterbox Bars */
+    .letterbox-bar {
+      height: 0%;
+      background: #000000;
+      transition: height 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 15;
+    }
+    .anamorphic-active .letterbox-bar {
+      height: 11.5%;
+    }
+
+    /* Custom Minimal Range Scrubber */
+    input[type=range].cinema-scrubber {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(242, 239, 233, 0.2);
+      height: 2px;
+      cursor: pointer;
+    }
+    input[type=range].cinema-scrubber::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px;
+      height: 10px;
+      background: var(--ink-bone);
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+    input[type=range].cinema-scrubber:hover::-webkit-slider-thumb {
+      transform: scale(1.4);
+      background: var(--accent-gold);
+    }
+
+    /* PIN Input Digit Box */
+    .pin-digit {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--hairline-strong);
+      color: var(--ink-bone);
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.25rem;
+      width: 3.2rem;
+      height: 4rem;
+      transition: border-color 0.3s ease;
+    }
+    .pin-digit:focus {
+      outline: none;
+      border-bottom-color: var(--accent-gold);
+    }
+
+    /* Hide Scrollbar on Contact Sheet */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200">
+<body class="selection:bg-[#c8a97e]/25 selection:text-[#f2efe9]">
 
-  <!-- DEV BAR: Μόνο για εσένα για να τεστάρεις τα UX states (Mobile vs Desktop & Couple vs Guest) -->
-  <div class="bg-zinc-900 border-b border-zinc-800 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 text-zinc-400">
-    <div class="flex items-center gap-2">
-      <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      <span class="font-medium text-zinc-200">DEV PREVIEW MODE:</span>
-      <span>Δοκίμασε πώς αλλάζει το UX ανά συσκευή και ρόλο (Demo PIN: <strong class="text-amber-400">2408</strong>)</span>
+  <!-- SVG Analog Noise Filter -->
+  <svg class="film-grain" xmlns="http://www.w3.org/2000/svg">
+    <filter id="analog-noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch" />
+      <feColorMatrix type="saturate" values="0" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#analog-noise)" />
+  </svg>
+
+  <!-- TOP ARCHITECTURAL MASTHEAD -->
+  <header class="w-full hairline-b sticky top-0 z-40 bg-[#080807]/85 backdrop-blur-md">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-12 h-16 flex items-center justify-between text-[11px] font-mono-tech tracking-[0.2em] uppercase">
+      
+      <div class="flex items-center gap-6">
+        <a href="#" class="text-[#f2efe9] font-medium tracking-[0.28em] flex items-center gap-2.5">
+          <span class="w-1.5 h-1.5 bg-[#c8a97e] inline-block"></span>
+          PM CINEMATOGRAPHY
+        </a>
+        <span class="hidden md:inline-block text-[#4a463f]">/</span>
+        <span class="hidden md:inline-block text-[#8a8479]">ARCHIVE NO. 042 — LSV</span>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-10 text-[#8a8479]">
+        <a href="#screening" class="hover:text-[#f2efe9] transition">I. Προβολη</a>
+        <a href="#reels" class="hover:text-[#f2efe9] transition">II. Κεφαλαια</a>
+        <a href="#stills" class="hover:text-[#f2efe9] transition">III. Καρε 35mm</a>
+        <a href="#vault" class="hover:text-[#f2efe9] transition">IV. Master Αρχείο</a>
+      </nav>
+
+      <div class="flex items-center gap-4">
+        <span id="access-indicator" class="text-[#8a8479] flex items-center gap-2">
+          <span id="access-dot" class="w-1.5 h-1.5 rounded-full bg-[#8a8479]"></span>
+          <span id="access-label">GUEST SCREENING</span>
+        </span>
+        <button id="header-vault-btn" onclick="scrollToVault()" class="hairline-box px-3.5 py-1.5 text-[10px] tracking-[0.22em] text-[#c8a97e] hover:bg-[#c8a97e] hover:text-[#080807] transition duration-300">
+          COUPLE KEY
+        </button>
+      </div>
+
     </div>
-    <div class="flex items-center gap-2">
-      <button onclick="setDeviceMode('desktop')" id="btn-desktop" class="px-2.5 py-1 rounded bg-zinc-800 text-white font-medium border border-zinc-700">
-        💻 Προσομοίωση Desktop
+  </header>
+
+  <!-- EDITORIAL HERO & TITLE EXHIBITION -->
+  <section class="max-w-[1440px] mx-auto px-6 md:px-12 pt-14 pb-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end hairline-b pb-10">
+      
+      <div class="lg:col-span-8">
+        <div class="flex items-center gap-3 text-[11px] font-mono-tech tracking-[0.25em] uppercase text-[#c8a97e] mb-4">
+          <span>A FILM BY PANAGIOTIS MAGNISALIS</span>
+          <span>—</span>
+          <span>ORIGINAL 4K DCI MASTER</span>
+        </div>
+        <h1 class="font-editorial text-6xl sm:text-7xl md:text-8xl font-light tracking-[-0.02em] leading-[0.95] text-[#f2efe9]">
+          Μαρία <span class="italic font-light text-[#c8a97e]">&amp;</span> Νίκος
+        </h1>
+      </div>
+
+      <div class="lg:col-span-4 flex flex-col justify-between lg:items-end text-left lg:text-right">
+        <p class="font-editorial italic text-xl md:text-2xl text-[#8a8479] max-w-sm leading-relaxed">
+          «Μια ανεπιτήδευτη καταγραφή φωτός, κίνησης και φωνών από το καλοκαίρι στη Λέσβο.»
+        </p>
+        <div class="mt-6 flex flex-wrap lg:justify-end gap-x-6 gap-y-1 font-mono-tech text-[11px] text-[#8a8479] tracking-[0.15em] uppercase">
+          <span>24.08.2026</span>
+          <span>•</span>
+          <span>39°06'N 26°33'E</span>
+          <span>•</span>
+          <span>24 FPS</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- I. THE SCREENING STAGE (CUSTOM VIDEO PLAYER) -->
+  <section id="screening" class="max-w-[1440px] mx-auto px-6 md:px-12 py-6 relative">
+    
+    <!-- Ambient Backlight -->
+    <div id="ambient-light" class="ambient-glow"></div>
+
+    <!-- Screening Frame Container -->
+    <div id="player-stage" class="relative z-10 w-full aspect-video bg-[#050504] hairline-box overflow-hidden group select-none">
+      
+      <!-- Top & Bottom CinemaScope 2.39:1 Curtains -->
+      <div class="letterbox-bar absolute top-0 left-0 right-0 pointer-events-none"></div>
+      <div class="letterbox-bar absolute bottom-0 left-0 right-0 pointer-events-none"></div>
+
+      <!-- Actual HTML5 Video with Atmospheric Fallback Poster -->
+      <video 
+        id="cinema-video"
+        class="w-full h-full object-cover opacity-85 transition duration-1000"
+        poster="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=85"
+        playsinline
+        loop
+        preload="metadata">
+        <!-- High-aesthetic atmospheric warm cinema loop -->
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-bride-and-groom-walking-in-a-field-at-sunset-41645-large.mp4" type="video/mp4">
+      </video>
+
+      <!-- Subtle Dark Vignette Overlay -->
+      <div id="video-vignette" class="absolute inset-0 bg-gradient-to-t from-[#080807]/90 via-transparent to-[#080807]/40 transition-opacity duration-500"></div>
+
+      <!-- Top Overlay Metadata Bar -->
+      <div class="absolute top-6 left-6 right-6 z-20 flex items-center justify-between text-[11px] font-mono-tech tracking-[0.2em] uppercase text-[#f2efe9]/80 pointer-events-none">
+        <div class="flex items-center gap-3">
+          <span class="px-2 py-0.5 border border-[#f2efe9]/25 bg-black/40 backdrop-blur-sm" id="stage-reel-code">REEL I / III</span>
+          <span id="stage-reel-spec" class="hidden sm:inline text-[#8a8479]">REC.709 • STEREO PCM 48KHZ</span>
+        </div>
+        <div class="flex items-center gap-2 pointer-events-auto">
+          <button onclick="toggleAnamorphic()" id="btn-anamorphic" class="px-2.5 py-1 border border-[#f2efe9]/20 bg-black/50 hover:border-[#c8a97e] text-[10px] tracking-[0.18em] transition">
+            CROP: 16:9
+          </button>
+          <button onclick="toggleAmbient()" id="btn-ambient" class="px-2.5 py-1 border border-[#c8a97e]/50 bg-black/50 text-[#c8a97e] text-[10px] tracking-[0.18em] transition">
+            AMBIENT: ON
+          </button>
+        </div>
+      </div>
+
+      <!-- Center Custom Bespoke SVG Reticle Play Button -->
+      <button id="center-play-trigger" onclick="togglePlay()" aria-label="Play Film" class="absolute inset-0 m-auto w-32 h-32 z-20 flex items-center justify-center group/btn focus:outline-none">
+        <!-- Rotating SVG Typography Ring -->
+        <svg class="w-full h-full spin-slow opacity-85 group-hover/btn:opacity-100 group-hover/btn:scale-105 transition duration-500" viewBox="0 0 120 120">
+          <defs>
+            <path id="circlePath" d="M 60, 60 m -46, 0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" />
+          </defs>
+          <circle cx="60" cy="60" r="56" fill="rgba(8,8,7,0.45)" stroke="rgba(242,239,233,0.18)" stroke-width="0.75" />
+          <text fill="#f2efe9" font-family="'JetBrains Mono', monospace" font-size="6.3" letter-spacing="2.9px">
+            <textPath href="#circlePath">PLAY FILM • 4K MASTER • PM CINEMA • </textPath>
+          </text>
+        </svg>
+        <!-- Center Minimal Play Triangle -->
+        <div class="absolute inset-0 flex items-center justify-center">
+          <svg id="center-play-icon" class="w-6 h-6 text-[#f2efe9] translate-x-0.5 group-hover/btn:text-[#c8a97e] transition" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+            <polygon points="6 4 20 12 6 20 6 4" fill="currentColor" />
+          </svg>
+        </div>
       </button>
-      <button onclick="setDeviceMode('mobile')" id="btn-mobile" class="px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white">
-        📱 Προσομοίωση Κινητού
+
+      <!-- Bottom Cinema Scrubber & Live 24fps Timecode Bar -->
+      <div class="absolute bottom-6 left-6 right-6 z-20 flex flex-col gap-3">
+        
+        <div class="flex items-end justify-between">
+          <div>
+            <p id="stage-subtitle" class="font-mono-tech text-[10px] tracking-[0.25em] uppercase text-[#c8a97e] mb-1">CHAPTER 01 — OVERTURE</p>
+            <h2 id="stage-title" class="font-editorial text-3xl md:text-4xl font-normal text-[#f2efe9] tracking-wide">The Teaser Film</h2>
+          </div>
+          <div class="text-right font-mono-tech text-xs tracking-[0.15em] text-[#f2efe9]/90 bg-black/50 px-3 py-1 border border-[#f2efe9]/15">
+            <span id="timecode-current">00:00:00:00</span>
+            <span class="text-[#8a8479] mx-1">/</span>
+            <span id="timecode-total">00:02:15:00</span>
+          </div>
+        </div>
+
+        <!-- Scrubber & Transport Controls -->
+        <div class="flex items-center gap-4 pt-2 border-t border-[#f2efe9]/15">
+          <button onclick="togglePlay()" class="text-[11px] font-mono-tech tracking-[0.2em] uppercase text-[#f2efe9] hover:text-[#c8a97e] w-16 text-left transition" id="transport-play-label">
+            PLAY
+          </button>
+          <input id="video-scrubber" type="range" min="0" max="100" value="0" step="0.1" oninput="seekVideo(this.value)" class="cinema-scrubber flex-1" />
+          <button onclick="toggleMute()" id="transport-mute-label" class="text-[11px] font-mono-tech tracking-[0.2em] uppercase text-[#8a8479] hover:text-[#f2efe9] transition">
+            AUDIO: ON
+          </button>
+          <button onclick="toggleFullscreen()" class="text-[11px] font-mono-tech tracking-[0.2em] uppercase text-[#8a8479] hover:text-[#f2efe9] transition">
+            FULLSCREEN
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- II. THE REELS (EDITORIAL FILM CHAPTERS) -->
+  <section id="reels" class="max-w-[1440px] mx-auto px-6 md:px-12 py-12">
+    <div class="flex items-baseline justify-between mb-6">
+      <div class="flex items-baseline gap-4">
+        <span class="font-mono-tech text-xs text-[#c8a97e] tracking-[0.2em]">II.</span>
+        <h3 class="font-editorial text-3xl md:text-4xl font-light text-[#f2efe9]">Πρόγραμμα Προβολής (The Reels)</h3>
+      </div>
+      <span class="font-mono-tech text-[11px] text-[#8a8479] tracking-[0.2em] uppercase">3 ΤΑΙΝΙΕΣ • ΣΥΝΟΛΙΚΗ ΔΙΑΡΚΕΙΑ 02:02:25</span>
+    </div>
+
+    <!-- Architectural 3-Column Hairline Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 hairline-t hairline-l">
+      
+      <!-- Reel I -->
+      <article onclick="switchReel(1)" id="reel-card-1" class="group cursor-pointer p-6 md:p-8 hairline-r hairline-b bg-[#0f0e0c] transition duration-500 relative">
+        <div class="flex items-center justify-between font-mono-tech text-[11px] tracking-[0.2em] mb-6">
+          <span class="text-[#c8a97e]" id="reel-badge-1">● NOW SCREENING — REEL I</span>
+          <span class="text-[#8a8479]">00:02:15:00</span>
+        </div>
+        <div class="aspect-[16/9] overflow-hidden mb-6 hairline-box relative">
+          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80" alt="Reel I" class="w-full h-full object-cover grayscale-[25%] group-hover:grayscale-0 group-hover:scale-105 transition duration-700" />
+          <div class="absolute bottom-2 right-2 bg-black/75 px-2 py-0.5 font-mono-tech text-[10px] tracking-widest text-[#f2efe9]">4K UHD</div>
+        </div>
+        <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal mb-2">The Overture (Teaser)</h4>
+        <p class="text-xs text-[#8a8479] leading-relaxed font-light">
+          Ένας γρήγορος, ρυθμικός πρόλογος με τις πιο έντονες στιγμές της ημέρας, μονταρισμένος ειδικά για άμεση αναπαραγωγή.
+        </p>
+      </article>
+
+      <!-- Reel II -->
+      <article onclick="switchReel(2)" id="reel-card-2" class="group cursor-pointer p-6 md:p-8 hairline-r hairline-b hover:bg-[#0f0e0c]/60 transition duration-500 relative">
+        <div class="flex items-center justify-between font-mono-tech text-[11px] tracking-[0.2em] mb-6">
+          <span class="text-[#8a8479]" id="reel-badge-2">REEL II — MAIN FEATURE</span>
+          <span class="text-[#8a8479]">00:42:10:00</span>
+        </div>
+        <div class="aspect-[16/9] overflow-hidden mb-6 hairline-box relative">
+          <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=900&q=80" alt="Reel II" class="w-full h-full object-cover grayscale-[45%] group-hover:grayscale-0 group-hover:scale-105 transition duration-700" />
+          <div class="absolute bottom-2 right-2 bg-black/75 px-2 py-0.5 font-mono-tech text-[10px] tracking-widest text-[#f2efe9]">4K UHD</div>
+        </div>
+        <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal mb-2">Main Documentary Film</h4>
+        <p class="text-xs text-[#8a8479] leading-relaxed font-light">
+          Η κύρια κινηματογραφική αφήγηση με φυσικό ήχο, ομιλίες, προετοιμασία και την ατμόσφαιρα του πάρτι.
+        </p>
+      </article>
+
+      <!-- Reel III -->
+      <article onclick="switchReel(3)" id="reel-card-3" class="group cursor-pointer p-6 md:p-8 hairline-r hairline-b hover:bg-[#0f0e0c]/60 transition duration-500 relative">
+        <div class="flex items-center justify-between font-mono-tech text-[11px] tracking-[0.2em] mb-6">
+          <span class="text-[#8a8479]" id="reel-badge-3">REEL III — UNCUT ARCHIVE</span>
+          <span class="text-[#8a8479]">01:18:00:00</span>
+        </div>
+        <div class="aspect-[16/9] overflow-hidden mb-6 hairline-box relative">
+          <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=900&q=80" alt="Reel III" class="w-full h-full object-cover grayscale-[45%] group-hover:grayscale-0 group-hover:scale-105 transition duration-700" />
+          <div class="absolute bottom-2 right-2 bg-black/75 px-2 py-0.5 font-mono-tech text-[10px] tracking-widest text-[#f2efe9]">MULTI-CAM</div>
+        </div>
+        <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal mb-2">Ceremony &amp; Toasts (Full Cut)</h4>
+        <p class="text-xs text-[#8a8479] leading-relaxed font-light">
+          Ολόκληρο το μυστήριο και οι ευχές των αγαπημένων σας προσώπων σε real-time ροή με 3 κάμερες.
+        </p>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- III. 35MM CONTACT SHEET (COLOR-GRADED STILLS) -->
+  <section id="stills" class="max-w-[1440px] mx-auto px-6 md:px-12 py-12">
+    <div class="flex items-baseline justify-between mb-6 hairline-b pb-4">
+      <div class="flex items-baseline gap-4">
+        <span class="font-mono-tech text-xs text-[#c8a97e] tracking-[0.2em]">III.</span>
+        <h3 class="font-editorial text-3xl md:text-4xl font-light text-[#f2efe9]">Επιλεγμένα Καρέ (Color-Graded Stills)</h3>
+      </div>
+      <span class="font-mono-tech text-[11px] text-[#8a8479] tracking-[0.2em] uppercase">KODAK 2383 LUT • FULL FRAME EXTRACTS</span>
+    </div>
+
+    <!-- Film Strip Contact Sheet -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <figure class="group cursor-pointer" onclick="loadStillIntoStage(this.querySelector('img').src, 'FRAME 24A — THE PREPARATION')">
+        <div class="flex justify-between font-mono-tech text-[10px] text-[#8a8479] tracking-[0.2em] mb-2">
+          <span>35MM — 24A</span>
+          <span class="group-hover:text-[#c8a97e] transition">ΠΡΟΒΟΛΗ ↗</span>
+        </div>
+        <div class="aspect-[16/10] overflow-hidden hairline-box bg-[#0f0e0c]">
+          <img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85" alt="Frame 24A" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+        </div>
+      </figure>
+
+      <figure class="group cursor-pointer" onclick="loadStillIntoStage(this.querySelector('img').src, 'FRAME 25A — GOLDEN HOUR WALK')">
+        <div class="flex justify-between font-mono-tech text-[10px] text-[#8a8479] tracking-[0.2em] mb-2">
+          <span>35MM — 25A</span>
+          <span class="group-hover:text-[#c8a97e] transition">ΠΡΟΒΟΛΗ ↗</span>
+        </div>
+        <div class="aspect-[16/10] overflow-hidden hairline-box bg-[#0f0e0c]">
+          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85" alt="Frame 25A" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+        </div>
+      </figure>
+
+      <figure class="group cursor-pointer" onclick="loadStillIntoStage(this.querySelector('img').src, 'FRAME 26A — THE VOWS')">
+        <div class="flex justify-between font-mono-tech text-[10px] text-[#8a8479] tracking-[0.2em] mb-2">
+          <span>35MM — 26A</span>
+          <span class="group-hover:text-[#c8a97e] transition">ΠΡΟΒΟΛΗ ↗</span>
+        </div>
+        <div class="aspect-[16/10] overflow-hidden hairline-box bg-[#0f0e0c]">
+          <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85" alt="Frame 26A" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+        </div>
+      </figure>
+
+      <figure class="group cursor-pointer" onclick="loadStillIntoStage(this.querySelector('img').src, 'FRAME 27A — MIDNIGHT RECEPTION')">
+        <div class="flex justify-between font-mono-tech text-[10px] text-[#8a8479] tracking-[0.2em] mb-2">
+          <span>35MM — 27A</span>
+          <span class="group-hover:text-[#c8a97e] transition">ΠΡΟΒΟΛΗ ↗</span>
+        </div>
+        <div class="aspect-[16/10] overflow-hidden hairline-box bg-[#0f0e0c]">
+          <img src="https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85" alt="Frame 27A" class="w-full h-full object-cover group-hover:scale-105 transition duration-700" />
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- IV. THE MASTER VAULT (ZERO-STORAGE ARCHIVE & DEVICE-AWARE DELIVERY) -->
+  <section id="vault" class="max-w-[1440px] mx-auto px-6 md:px-12 py-16">
+    <div class="hairline-box bg-[#0c0b09] p-8 md:p-16 relative overflow-hidden">
+      
+      <!-- Vault Header -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 hairline-b pb-10 items-end">
+        <div class="lg:col-span-8">
+          <div class="flex items-center gap-3 font-mono-tech text-[11px] tracking-[0.22em] text-[#c8a97e] uppercase mb-3">
+            <span>IV. PRIVATE ARCHIVE VAULT</span>
+            <span>—</span>
+            <span>CLOUD PRESERVATION: 165 DAYS REMAINING</span>
+          </div>
+          <h3 class="font-editorial text-4xl md:text-5xl font-light text-[#f2efe9]">
+            Φύλαξη &amp; Λήψη Master Αρχείων
+          </h3>
+        </div>
+        <div class="lg:col-span-4 lg:text-right font-mono-tech text-[11px] text-[#8a8479] tracking-[0.15em]">
+          <div>TOTAL ARCHIVE SIZE: 28.58 GB</div>
+          <div class="text-[#4a463f] mt-1">DIRECT CLOUD STREAM • ZERO COMPRESSION</div>
+        </div>
+      </div>
+
+      <!-- STATE A: LOCKED VAULT (4-DIGIT ARCHITECTURAL PIN PAD) -->
+      <div id="vault-locked-view" class="py-16 max-w-xl mx-auto text-center">
+        <svg class="w-7 h-7 mx-auto text-[#c8a97e] mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <rect x="4" y="11" width="16" height="10" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          <circle cx="12" cy="16" r="1" fill="currentColor" />
+        </svg>
+
+        <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal mb-3">
+          Περιορισμένη Πρόσβαση Ζευγαριού
+        </h4>
+        <p class="text-xs text-[#8a8479] leading-relaxed max-w-md mx-auto mb-10 font-light">
+          Η προβολή των ταινιών είναι ελεύθερη για τους καλεσμένους σας. Για να ξεκλειδώσετε τα ασυμπίεστα Master 4K αρχεία (28.4 GB), πληκτρολογήστε τον 4-ψήφιο κωδικό της ημερομηνίας σας.
+        </p>
+
+        <!-- 4 Architectural Underline Inputs (Auto-unlocks on 4th digit) -->
+        <div class="flex items-center justify-center gap-4 mb-6" id="pin-pad">
+          <input type="text" inputmode="numeric" maxlength="1" class="pin-digit" oninput="handlePinDigit(this, 0)" onkeydown="handlePinBackspace(event, 0)" />
+          <input type="text" inputmode="numeric" maxlength="1" class="pin-digit" oninput="handlePinDigit(this, 1)" onkeydown="handlePinBackspace(event, 1)" />
+          <input type="text" inputmode="numeric" maxlength="1" class="pin-digit" oninput="handlePinDigit(this, 2)" onkeydown="handlePinBackspace(event, 2)" />
+          <input type="text" inputmode="numeric" maxlength="1" class="pin-digit" oninput="handlePinDigit(this, 3)" onkeydown="handlePinBackspace(event, 3)" />
+        </div>
+
+        <div class="flex items-center justify-center gap-4 font-mono-tech text-[11px] tracking-[0.2em]">
+          <span id="pin-status-msg" class="text-[#8a8479]">ENTER 4-DIGIT COUPLE KEY</span>
+          <span class="text-[#4a463f]">|</span>
+          <button onclick="autoUnlockDemo()" class="text-[#c8a97e] underline underline-offset-4 hover:text-[#f2efe9] transition">
+            AUTO-FILL DEMO (2408)
+          </button>
+        </div>
+      </div>
+
+      <!-- STATE B: UNLOCKED VAULT (SPECIFICATION LEDGER) -->
+      <div id="vault-unlocked-view" class="hidden pt-10">
+        
+        <!-- Device-Aware Mobile Notice (Shown only on Mobile or when simulated in HUD) -->
+        <div id="device-mobile-banner" class="hidden mb-10 p-6 border border-[#c8a97e]/40 bg-[#c8a97e]/[0.04] flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="font-mono-tech text-[10px] tracking-[0.25em] uppercase text-[#c8a97e] mb-1">
+              SMART DEVICE PROTECTION ACTIVE
+            </div>
+            <p class="text-xs text-[#f2efe9]/90 font-light leading-relaxed">
+              Συνδεθήκατε από κινητή συσκευή. Η λήψη της έκδοσης <strong>Social Media (180 MB)</strong> είναι άμεσα διαθέσιμη. Τα Master αρχεία των <strong>28.4 GB</strong> είναι κλειδωμένα σε κινητά για να μην αποτύχει η λήψη λόγω μνήμης.
+            </p>
+          </div>
+          <button onclick="sendDesktopReminder()" class="shrink-0 hairline-box px-5 py-3 font-mono-tech text-[10px] tracking-[0.22em] uppercase text-[#c8a97e] hover:bg-[#c8a97e] hover:text-[#080807] transition">
+            ΑΠΟΣΤΟΛΗ LINK ΣΤΟ EMAIL ΜΟΥ (ΓΙΑ PC)
+          </button>
+        </div>
+
+        <!-- Architectural Specification Rows -->
+        <div class="divide-y divide-[#f2efe9]/10">
+          
+          <!-- Deliverable 01: Social / Mobile Cut -->
+          <div class="py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div class="lg:col-span-2 font-mono-tech text-xs text-[#8a8479] tracking-[0.2em]">
+              DELIVERABLE 01<br/>
+              <span class="text-[#c8a97e] text-[10px]">INSTANT ACCESS</span>
+            </div>
+            <div class="lg:col-span-6">
+              <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal">Social &amp; Mobile Edition (Teaser)</h4>
+              <p class="text-xs text-[#8a8479] font-light mt-1">
+                Βελτιστοποιημένο αρχείο H.264 MP4 για άμεση αποθήκευση στο iPhone/Android σας και ανάρτηση σε Instagram / Reels χωρίς απώλεια ποιότητας.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-4 font-mono-tech text-[10px] text-[#8a8479] tracking-[0.18em]">
+                <span>1080P FULL HD</span>
+                <span>•</span>
+                <span>AAC STEREO</span>
+                <span>•</span>
+                <span>180 MB</span>
+              </div>
+            </div>
+            <div class="lg:col-span-4 lg:text-right">
+              <a href="#direct-r2-social-download" onclick="triggerDirectDownload('Social_Teaser_1080p.mp4', '180 MB')" class="inline-flex items-center justify-between gap-6 hairline-box px-6 py-4 font-mono-tech text-[11px] tracking-[0.22em] uppercase text-[#f2efe9] hover:border-[#c8a97e] hover:text-[#c8a97e] transition w-full sm:w-auto">
+                <span>ΛΗΨΗ ΑΡΧΕΙΟΥ (180 MB)</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 4v14m0 0l-5-5m5 5l5-5M5 21h14"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Deliverable 02: 4K Master Archive (28.4 GB) -->
+          <div class="py-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div class="lg:col-span-2 font-mono-tech text-xs text-[#8a8479] tracking-[0.2em]">
+              DELIVERABLE 02<br/>
+              <span class="text-[#c8a97e] text-[10px]">ARCHIVAL MASTER</span>
+            </div>
+            <div class="lg:col-span-6">
+              <h4 class="font-editorial text-3xl text-[#f2efe9] font-normal">Complete 4K Cinema Master Pack</h4>
+              <p class="text-xs text-[#8a8479] font-light mt-1">
+                Και οι 3 ταινίες (Teaser, Main Documentary, Full Ceremony) σε ασυμπίεστο Master Bitrate για προβολή σε μεγάλη Smart TV και ισόβια αρχειοθέτηση σε εξωτερικό δίσκο.
+              </p>
+              <div class="mt-3 flex flex-wrap gap-4 font-mono-tech text-[10px] text-[#8a8479] tracking-[0.18em]">
+                <span>3840×2160 UHD</span>
+                <span>•</span>
+                <span>60 MBPS MASTER</span>
+                <span>•</span>
+                <span>28.4 GB</span>
+              </div>
+            </div>
+            <div class="lg:col-span-4 lg:text-right">
+              <!-- Desktop Button -->
+              <a id="btn-master-desktop" href="#direct-r2-master-download" onclick="triggerDirectDownload('Maria_Nikos_4K_Master_Archive.zip', '28.4 GB')" class="inline-flex items-center justify-between gap-6 bg-[#f2efe9] text-[#080807] hover:bg-[#c8a97e] px-6 py-4 font-mono-tech text-[11px] font-medium tracking-[0.22em] uppercase transition w-full sm:w-auto">
+                <span>ΛΗΨΗ MASTER 4K (28.4 GB)</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M12 4v14m0 0l-5-5m5 5l5-5M5 21h14"/>
+                </svg>
+              </a>
+              <!-- Mobile Disabled Indicator -->
+              <div id="btn-master-mobile" class="hidden inline-flex items-center justify-between gap-4 hairline-box px-6 py-4 font-mono-tech text-[10px] tracking-[0.2em] uppercase text-[#8a8479] w-full sm:w-auto">
+                <span>ΑΠΑΙΤΕΙΤΑΙ ΥΠΟΛΟΓΙΣΤΗΣ (28.4 GB)</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Technical Preservation & Smart TV Guide -->
+        <div class="mt-8 pt-8 hairline-t grid grid-cols-1 md:grid-cols-2 gap-8 text-xs text-[#8a8479] font-light">
+          <div>
+            <div class="font-mono-tech text-[10px] tracking-[0.22em] text-[#f2efe9] uppercase mb-2">
+              01 / ΟΔΗΓΟΣ ΑΝΑΠΑΡΑΓΩΓΗΣ ΣΕ SMART TV (USB EXFAT)
+            </div>
+            <p class="leading-relaxed">
+              Επειδή το Master αρχείο υπερβαίνει τα 4 GB, βεβαιωθείτε ότι το USB stick σας είναι μορφοποιημένο σε <strong class="text-[#f2efe9] font-normal">exFAT</strong> (και όχι FAT32) πριν μεταφέρετε τα αρχεία για την τηλεόρασή σας.
+            </p>
+          </div>
+          <div>
+            <div class="font-mono-tech text-[10px] tracking-[0.22em] text-[#f2efe9] uppercase mb-2">
+              02 / ΠΟΛΙΤΙΚΗ ΙΣΟΒΙΑΣ ΑΡΧΕΙΟΘΕΤΗΣΗΣ (3-2-1 RULE)
+            </div>
+            <p class="leading-relaxed">
+              Το online αντίγραφο παραμένει ενεργό για 6 μήνες. Σας προτείνουμε να διατηρείτε τα Master αρχεία σε δύο ξεχωριστούς φυσικούς δίσκους.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FILM CREDITS FOOTER -->
+  <footer class="max-w-[1440px] mx-auto px-6 md:px-12 py-16 hairline-t text-center">
+    <p class="font-mono-tech text-[10px] tracking-[0.3em] text-[#8a8479] uppercase mb-3">
+      DIRECTED, FILMED &amp; COLOR GRADED BY
+    </p>
+    <div class="font-editorial text-3xl tracking-widest text-[#f2efe9] mb-8">
+      PM CINEMATOGRAPHY
+    </div>
+    <div class="font-mono-tech text-[10px] tracking-[0.2em] text-[#4a463f] uppercase">
+      © 2026 PM CINEMATOGRAPHY • PRIVATE CLIENT EXHIBITION PORTAL
+    </div>
+  </footer>
+
+  <!-- DISCREET FLOATING STUDIO INSPECTOR (Bottom-Right HUD for testing Desktop/Mobile & Lock states) -->
+  <div class="fixed bottom-5 right-5 z-50 bg-[#0f0e0c]/95 backdrop-blur-md hairline-box px-4 py-3 shadow-2xl">
+    <div class="flex items-center gap-4 font-mono-tech text-[10px] tracking-[0.18em] uppercase">
+      <span class="text-[#c8a97e]">HUD:</span>
+      <button onclick="setSimulatedDevice('desktop')" id="hud-desktop" class="text-[#f2efe9] underline underline-offset-4">
+        DESKTOP
+      </button>
+      <span class="text-[#4a463f]">/</span>
+      <button onclick="setSimulatedDevice('mobile')" id="hud-mobile" class="text-[#8a8479] hover:text-[#f2efe9]">
+        MOBILE (30GB GUARD)
+      </button>
+      <span class="text-[#4a463f]">|</span>
+      <button onclick="autoUnlockDemo()" class="text-[#8a8479] hover:text-[#c8a97e]">
+        PIN: 2408
       </button>
     </div>
   </div>
 
-  <!-- TOP NAVIGATION -->
-  <header class="max-w-6xl w-full mx-auto px-6 py-6 flex items-center justify-between border-b border-zinc-900">
-    <div class="tracking-[0.25em] text-xs uppercase font-semibold text-zinc-300">
-      PM CINEMATOGRAPHY <span class="text-zinc-600 mx-2">|</span> <span class="text-zinc-500 font-normal">PRIVATE SCREENING ROOM</span>
-    </div>
-    <div class="flex items-center gap-3">
-      <span id="role-badge" class="text-xs px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400">
-        👁️ Προβολή Επισκέπτη
-      </span>
-      <button id="unlock-top-btn" onclick="scrollToVault()" class="text-xs px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition">
-        🔑 Ξεκλείδωμα Αρχείων (PIN)
-      </button>
-    </div>
-  </header>
-
-  <!-- HERO / TITLE SECTION -->
-  <main class="max-w-5xl w-full mx-auto px-6 py-10 flex-1">
-    <div class="text-center mb-8">
-      <p class="text-xs uppercase tracking-[0.3em] text-amber-400/80 mb-2">Unobtrusive Documentary Film</p>
-      <h1 class="font-serif-cinema text-5xl md:text-6xl font-normal tracking-wide text-white mb-2">Μαρία & Νίκος</h1>
-      <p class="text-sm text-zinc-400 font-light">24 Αυγούστου 2026 • Μυτιλήνη, Λέσβος</p>
-    </div>
-
-    <!-- THE SCREENING ROOM (STREAMING PLAYER) -->
-    <section class="mb-12">
-      <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 shadow-2xl group">
-        <!-- Mock Video Poster / Frame -->
-        <img id="video-poster" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80" alt="Wedding Still" class="w-full h-full object-cover opacity-65 group-hover:scale-[1.01] transition duration-700" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
-
-        <!-- Center Play Button -->
-        <button onclick="alert('Εδώ ξεκινάει ο clean player (π.χ. Vidstack / Bunny Stream / Vimeo Unlisted) σε 4K χωρίς διαφημίσεις.')" class="absolute inset-0 m-auto w-20 h-20 rounded-full bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center hover:scale-110 hover:bg-white/25 transition duration-300">
-          <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-
-        <!-- Bottom Film Metadata inside Player -->
-        <div class="absolute bottom-5 left-6 right-6 flex items-end justify-between">
-          <div>
-            <span id="active-chapter-tag" class="text-[11px] uppercase tracking-widest text-amber-300 bg-black/60 backdrop-blur px-2.5 py-1 rounded">01. Highlight Teaser</span>
-            <h2 id="active-chapter-title" class="text-xl font-medium text-white mt-1.5">The Teaser Film</h2>
-          </div>
-          <span id="active-chapter-duration" class="text-xs text-zinc-300 bg-black/60 px-2.5 py-1 rounded">02:15 • 4K UHD</span>
-        </div>
-      </div>
-
-      <!-- Chapter / Film Selector -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-        <button onclick="selectFilm(1)" id="film-btn-1" class="text-left p-4 rounded-xl bg-zinc-900/90 border border-amber-500/40 transition">
-          <div class="flex justify-between items-center text-xs text-amber-400 mb-1">
-            <span>ΜΕΡΟΣ 01</span>
-            <span>02:15</span>
-          </div>
-          <div class="font-medium text-sm text-white">The Teaser Film</div>
-          <div class="text-xs text-zinc-400 mt-0.5">Σύντομη κινηματογραφική περίληψη</div>
-        </button>
-
-        <button onclick="selectFilm(2)" id="film-btn-2" class="text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition">
-          <div class="flex justify-between items-center text-xs text-zinc-400 mb-1">
-            <span>ΜΕΡΟΣ 02</span>
-            <span>42:10</span>
-          </div>
-          <div class="font-medium text-sm text-white">Main Documentary Film</div>
-          <div class="text-xs text-zinc-500 mt-0.5">Η κύρια ταινία του γάμου σας</div>
-        </button>
-
-        <button onclick="selectFilm(3)" id="film-btn-3" class="text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition">
-          <div class="flex justify-between items-center text-xs text-zinc-400 mb-1">
-            <span>ΜΕΡΟΣ 03</span>
-            <span>1:18:00</span>
-          </div>
-          <div class="font-medium text-sm text-white">Ceremony & Speeches</div>
-          <div class="text-xs text-zinc-500 mt-0.5">Ολόκληρο το μυστήριο & οι ευχές</div>
-        </button>
-      </div>
-    </section>
-
-    <!-- THE VAULT (DOWNLOADS & ARCHIVE - 30GB) -->
-    <section id="vault-section" class="rounded-2xl bg-zinc-900/50 border border-zinc-800/90 p-6 md:p-8">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
-        <div>
-          <div class="flex items-center gap-2">
-            <h3 class="text-xl font-medium text-white">Ψηφιακό Αρχείο & Λήψεις (The Vault)</h3>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Cloud Backup Ενεργό (165 ημέρες ακόμα)
-            </span>
-          </div>
-          <p class="text-sm text-zinc-400 mt-1">
-            Εδώ βρίσκονται τα ασυμπίεστα Master αρχεία σας για αποθήκευση σε υπολογιστή/USB και οι εκδόσεις για Social Media.
-          </p>
-        </div>
-      </div>
-
-      <!-- LOCKED STATE (Visible to Guests until PIN is entered) -->
-      <div id="vault-locked" class="py-8 text-center max-w-md mx-auto">
-        <div class="w-12 h-12 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center mx-auto mb-3 text-amber-400">
-          🔒
-        </div>
-        <h4 class="text-base font-medium text-white">Περιοχή μόνο για το Ζευγάρι</h4>
-        <p class="text-xs text-zinc-400 mt-1 mb-5">
-          Οι επισκέπτες μπορούν να παρακολουθήσουν τις ταινίες παραπάνω. Για τη λήψη των Master αρχείων (30 GB), εισάγετε το 4-ψήφιο PIN σας (δοκίμασε <strong class="text-zinc-200">2408</strong>).
-        </p>
-        <div class="flex items-center justify-center gap-2">
-          <input id="pin-input" type="password" maxlength="4" placeholder="PIN (2408)" class="w-36 text-center tracking-[0.3em] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400" />
-          <button onclick="unlockVault()" class="bg-amber-500 hover:bg-amber-400 text-black font-medium text-sm px-4 py-2 rounded-lg transition">
-            Ξεκλείδωμα
-          </button>
-        </div>
-        <p id="pin-error" class="text-xs text-rose-400 mt-2 hidden">Λάθος PIN. Δοκιμάστε το 2408.</p>
-      </div>
-
-      <!-- UNLOCKED STATE (Visible after PIN) -->
-      <div id="vault-unlocked" class="hidden pt-6 space-y-4">
-        
-        <!-- Mobile Warning Banner (Only visible when Mobile Mode is simulated or on small screen) -->
-        <div id="mobile-warning" class="hidden rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 text-xs text-amber-200 flex items-start gap-3">
-          <span class="text-lg">📱</span>
-          <div>
-            <strong class="block text-amber-300 mb-0.5">Βρίσκεστε σε Κινητή Συσκευή</strong>
-            Μπορείτε να κατεβάσετε άμεσα το Teaser για τα Social Media (180 MB). Τα μεγάλα Master αρχεία (28.4 GB) έχουν κλειδώσει αυτόματα για να μην γεμίσει η μνήμη του κινητού σας. Ανοίξτε τη σελίδα από υπολογιστή.
-          </div>
-        </div>
-
-        <!-- Download Card 1: Social Media Ready (Always active on Mobile & Desktop) -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-white">1. Έκδοση για Κινητό & Social Media (Instagram / TikTok)</span>
-              <span class="text-[11px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">1080p MP4 • 180 MB</span>
-            </div>
-            <p class="text-xs text-zinc-400 mt-1">Κατεβαίνει σε λιγότερο από 1 λεπτό. Έτοιμο για αποθήκευση στο κινητό και κοινοποίηση.</p>
-          </div>
-          <a href="#direct-cloud-link-social" onclick="alert('Direct Download Link (π.χ. Cloudflare R2 / Google Drive Direct) - Μηδενικό traffic στον server σου!')" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-medium transition">
-            ⬇️ Λήψη στο Κινητό / PC (180 MB)
-          </a>
-        </div>
-
-        <!-- Download Card 2: Heavy Master 4K Archive (30GB - Disabled on Mobile, Active on Desktop) -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="text-sm font-medium text-white">2. Master 4K Cinema Pack (Όλες οι ταινίες σε πλήρη ποιότητα)</span>
-              <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">4K UHD • 28.4 GB</span>
-            </div>
-            <p class="text-xs text-zinc-400 mt-1">Αρχεία υψηλού bitrate για προβολή σε μεγάλη Smart TV και μόνιμη αρχειοθέτηση σε σκληρό δίσκο.</p>
-          </div>
-
-          <!-- Desktop Button -->
-          <a id="master-download-desktop" href="#direct-cloud-link-master" onclick="alert('Direct Download 28.4 GB απευθείας από Google Drive / R2!')" class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold transition">
-            ⬇️ Λήψη Master 4K (28.4 GB)
-          </a>
-
-          <!-- Mobile Fallback Button -->
-          <button id="master-download-mobile" onclick="alert('Θα σταλεί email υπενθύμισης με το link στο ζευγάρι για να το ανοίξουν από το laptop τους!')" class="hidden shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs font-medium">
-            ✉️ Στείλε μου υπενθύμιση για PC
-          </button>
-        </div>
-
-        <!-- Smart TV / USB exFAT Micro-Guide -->
-        <details class="group rounded-xl bg-zinc-950/40 border border-zinc-800/80 px-4 py-3 text-xs text-zinc-400">
-          <summary class="cursor-pointer font-medium text-zinc-300 flex items-center justify-between">
-            <span>📺 Πώς να δείτε το Master 4K αρχείο στην Τηλεόρασή σας (Οδηγός USB)</span>
-            <span class="group-open:rotate-180 transition">▼</span>
-          </summary>
-          <div class="mt-2 pt-2 border-t border-zinc-800/80 space-y-1 leading-relaxed">
-            <p>• Επειδή τα Master αρχεία ξεπερνούν τα 4 GB, το USB φλασάκι σας πρέπει να είναι μορφοποιημένο σε <strong>exFAT</strong> (και όχι FAT32).</p>
-            <p>• Κάντε αντιγραφή των αρχείων `.mp4` στο USB και συνδέστε το απευθείας στη θύρα USB της Smart TV σας.</p>
-          </div>
-        </details>
-
-      </div>
-    </section>
-  </main>
-
-  <footer class="max-w-6xl w-full mx-auto px-6 py-8 border-t border-zinc-900 text-center text-xs text-zinc-600">
-    Crafted by PM Cinematography • Zero-Storage Client Portal Architecture
-  </footer>
-
   <script>
-    const films = {
-      1: { tag: '01. Highlight Teaser', title: 'The Teaser Film', duration: '02:15 • 4K UHD', poster: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80' },
-      2: { tag: '02. Main Feature', title: 'Main Documentary Film', duration: '42:10 • 4K UHD', poster: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1600&q=80' },
-      3: { tag: '03. Full Archive', title: 'Ceremony & Speeches', duration: '1:18:00 • 4K UHD', poster: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1600&q=80' }
+    const video = document.getElementById('cinema-video');
+    const playTrigger = document.getElementById('center-play-trigger');
+    const vignette = document.getElementById('video-vignette');
+    const transportPlayLabel = document.getElementById('transport-play-label');
+    const scrubber = document.getElementById('video-scrubber');
+    const tcCurrent = document.getElementById('timecode-current');
+    const tcTotal = document.getElementById('timecode-total');
+
+    const reelsData = {
+      1: {
+        code: 'REEL I / III',
+        sub: 'CHAPTER 01 — OVERTURE',
+        title: 'The Overture (Teaser)',
+        tc: '00:02:15:00',
+        poster: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=85'
+      },
+      2: {
+        code: 'REEL II / III',
+        sub: 'CHAPTER 02 — MAIN FEATURE',
+        title: 'Main Documentary Film',
+        tc: '00:42:10:00',
+        poster: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=2000&q=85'
+      },
+      3: {
+        code: 'REEL III / III',
+        sub: 'CHAPTER 03 — FULL ARCHIVE',
+        title: 'Ceremony & Toasts (Full Cut)',
+        tc: '01:18:00:00',
+        poster: 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=2000&q=85'
+      }
     };
 
-    function selectFilm(id) {
-      document.getElementById('active-chapter-tag').textContent = films[id].tag;
-      document.getElementById('active-chapter-title').textContent = films[id].title;
-      document.getElementById('active-chapter-duration').textContent = films[id].duration;
-      document.getElementById('video-poster').src = films[id].poster;
-
-      [1, 2, 3].forEach(num => {
-        const btn = document.getElementById('film-btn-' + num);
-        if (num === id) {
-          btn.className = 'text-left p-4 rounded-xl bg-zinc-900/90 border border-amber-500/40 transition';
-        } else {
-          btn.className = 'text-left p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition';
-        }
-      });
+    function formatSMPTE(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = Math.floor(seconds % 60);
+      const frames = Math.floor((seconds % 1) * 24);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${pad(hrs)}:${pad(mins)}:${pad(secs)}:${pad(frames)}`;
     }
 
-    function scrollToVault() {
-      document.getElementById('vault-section').scrollIntoView({ behavior: 'smooth' });
-      document.getElementById('pin-input').focus();
-    }
-
-    function unlockVault() {
-      const pin = document.getElementById('pin-input').value.trim();
-      if (pin === '2408') {
-        document.getElementById('vault-locked').classList.add('hidden');
-        document.getElementById('vault-unlocked').classList.remove('hidden');
-        document.getElementById('role-badge').innerHTML = '🔓 Πρόσβαση Ζευγαριού';
-        document.getElementById('role-badge').className = 'text-xs px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300';
-        document.getElementById('unlock-top-btn').classList.add('hidden');
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        playTrigger.classList.add('opacity-0', 'pointer-events-none');
+        vignette.classList.add('opacity-30');
+        transportPlayLabel.textContent = 'PAUSE';
       } else {
-        document.getElementById('pin-error').classList.remove('hidden');
+        video.pause();
+        playTrigger.classList.remove('opacity-0', 'pointer-events-none');
+        vignette.classList.remove('opacity-30');
+        transportPlayLabel.textContent = 'PLAY';
       }
     }
 
-    function setDeviceMode(mode) {
-      const isMobile = mode === 'mobile';
-      document.getElementById('mobile-warning').classList.toggle('hidden', !isMobile);
-      document.getElementById('master-download-desktop').classList.toggle('hidden', isMobile);
-      document.getElementById('master-download-mobile').classList.toggle('hidden', !isMobile);
+    video.addEventListener('timeupdate', () => {
+      if (video.duration) {
+        scrubber.value = (video.currentTime / video.duration) * 100;
+        tcCurrent.textContent = formatSMPTE(video.currentTime);
+      }
+    });
 
-      document.getElementById('btn-desktop').className = !isMobile
-        ? 'px-2.5 py-1 rounded bg-zinc-800 text-white font-medium border border-zinc-700'
-        : 'px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white';
-      document.getElementById('btn-mobile').className = isMobile
-        ? 'px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 font-medium border border-amber-500/40'
-        : 'px-2.5 py-1 rounded bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white';
+    function seekVideo(val) {
+      if (video.duration) {
+        video.currentTime = (val / 100) * video.duration;
+      }
+    }
+
+    function toggleMute() {
+      video.muted = !video.muted;
+      document.getElementById('transport-mute-label').textContent = video.muted ? 'AUDIO: MUTED' : 'AUDIO: ON';
+    }
+
+    function toggleFullscreen() {
+      const stage = document.getElementById('player-stage');
+      if (!document.fullscreenElement) {
+        stage.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    let isAnamorphic = false;
+    function toggleAnamorphic() {
+      isAnamorphic = !isAnamorphic;
+      const stage = document.getElementById('player-stage');
+      const btn = document.getElementById('btn-anamorphic');
+      stage.classList.toggle('anamorphic-active', isAnamorphic);
+      btn.textContent = isAnamorphic ? 'CROP: 2.39:1' : 'CROP: 16:9';
+      btn.classList.toggle('border-[#c8a97e]', isAnamorphic);
+      btn.classList.toggle('text-[#c8a97e]', isAnamorphic);
+    }
+
+    let isAmbient = true;
+    function toggleAmbient() {
+      isAmbient = !isAmbient;
+      const glow = document.getElementById('ambient-light');
+      const btn = document.getElementById('btn-ambient');
+      glow.style.opacity = isAmbient ? '0.85' : '0';
+      btn.textContent = isAmbient ? 'AMBIENT: ON' : 'AMBIENT: OFF';
+    }
+
+    function switchReel(id) {
+      const data = reelsData[id];
+      video.pause();
+      playTrigger.classList.remove('opacity-0', 'pointer-events-none');
+      transportPlayLabel.textContent = 'PLAY';
+      video.poster = data.poster;
+      video.load();
+
+      document.getElementById('stage-reel-code').textContent = data.code;
+      document.getElementById('stage-subtitle').textContent = data.sub;
+      document.getElementById('stage-title').textContent = data.title;
+      tcTotal.textContent = data.tc;
+      tcCurrent.textContent = '00:00:00:00';
+
+      [1, 2, 3].forEach(n => {
+        const card = document.getElementById('reel-card-' + n);
+        const badge = document.getElementById('reel-badge-' + n);
+        if (n === id) {
+          card.classList.add('bg-[#0f0e0c]');
+          badge.className = 'text-[#c8a97e]';
+          badge.textContent = `● NOW SCREENING — REEL ${n === 1 ? 'I' : n === 2 ? 'II' : 'III'}`;
+        } else {
+          card.classList.remove('bg-[#0f0e0c]');
+          badge.className = 'text-[#8a8479]';
+          badge.textContent = `REEL ${n === 1 ? 'I' : n === 2 ? 'II' : 'III'}`;
+        }
+      });
+
+      document.getElementById('screening').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function loadStillIntoStage(src, caption) {
+      video.pause();
+      playTrigger.classList.remove('opacity-0', 'pointer-events-none');
+      video.poster = src;
+      video.load();
+      document.getElementById('stage-subtitle').textContent = '35MM STILL FRAME INSPECTION';
+      document.getElementById('stage-title').textContent = caption;
+      document.getElementById('screening').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function scrollToVault() {
+      document.getElementById('vault').scrollIntoView({ behavior: 'smooth' });
+      const digits = document.querySelectorAll('.pin-digit');
+      if (digits[0]) setTimeout(() => digits[0].focus(), 500);
+    }
+
+    function handlePinDigit(input, index) {
+      const digits = document.querySelectorAll('.pin-digit');
+      if (input.value.length === 1 && index < 3) {
+        digits[index + 1].focus();
+      }
+      const code = Array.from(digits).map(d => d.value).join('');
+      if (code.length === 4) {
+        verifyPinCode(code);
+      }
+    }
+
+    function handlePinBackspace(e, index) {
+      const digits = document.querySelectorAll('.pin-digit');
+      if (e.key === 'Backspace' && !digits[index].value && index > 0) {
+        digits[index - 1].focus();
+      }
+    }
+
+    function verifyPinCode(code) {
+      const statusMsg = document.getElementById('pin-status-msg');
+      if (code === '2408') {
+        document.getElementById('vault-locked-view').classList.add('hidden');
+        document.getElementById('vault-unlocked-view').classList.remove('hidden');
+        document.getElementById('access-label').textContent = 'COUPLE MASTER ACCESS';
+        document.getElementById('access-label').classList.add('text-[#c8a97e]');
+        document.getElementById('access-dot').className = 'w-1.5 h-1.5 rounded-full bg-[#c8a97e]';
+        document.getElementById('header-vault-btn').textContent = 'VAULT UNLOCKED';
+      } else {
+        statusMsg.textContent = 'INVALID KEY — TRY 2408';
+        statusMsg.className = 'text-rose-400';
+      }
+    }
+
+    function autoUnlockDemo() {
+      const digits = document.querySelectorAll('.pin-digit');
+      ['2', '4', '0', '8'].forEach((val, idx) => { digits[idx].value = val; });
+      verifyPinCode('2408');
+      document.getElementById('vault').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function setSimulatedDevice(mode) {
+      const isMobile = mode === 'mobile';
+      document.getElementById('device-mobile-banner').classList.toggle('hidden', !isMobile);
+      document.getElementById('btn-master-desktop').classList.toggle('hidden', isMobile);
+      document.getElementById('btn-master-mobile').classList.toggle('hidden', !isMobile);
+
+      document.getElementById('hud-desktop').className = !isMobile
+        ? 'text-[#f2efe9] underline underline-offset-4'
+        : 'text-[#8a8479] hover:text-[#f2efe9]';
+      document.getElementById('hud-mobile').className = isMobile
+        ? 'text-[#c8a97e] underline underline-offset-4'
+        : 'text-[#8a8479] hover:text-[#f2efe9]';
+    }
+
+    function triggerDirectDownload(filename, size) {
+      alert(`Ξεκινάει απευθείας λήψη του "${filename}" (${size}) από το Cloud Storage σου (Google Drive Direct / Cloudflare R2) χωρίς καμία επιβάρυνση στο hosting του pmcinematography.site.`);
+    }
+
+    function sendDesktopReminder() {
+      alert('Στάλθηκε αυτοματοποιημένο email στο ζευγάρι με απευθείας link για να κατεβάσουν τα 28.4 GB από τον υπολογιστή τους.');
+    }
+
+    // Auto-detect mobile screen width on initial load
+    if (window.innerWidth < 768) {
+      setSimulatedDevice('mobile');
     }
   </script>
 </body>
